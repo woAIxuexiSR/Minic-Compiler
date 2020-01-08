@@ -341,15 +341,11 @@ void translate(TreeNode *node)
 											break;
 										 }
 						case CALL_TYPE: {
-											bool f = (node->rchild->name == "f_getint") || (node->rchild->name == "f_getchar") ||
-													(node->rchild->name == "f_putint") || (node->rchild->name == "f_putchar");
-											if(!f)
-												for(int i = III; i < IV; ++i)
-													printf("store t%d %d\n", i - III, i);
+											for(int i = III; i < IV; ++i)
+												printf("store t%d %d\n", i - III, i);
 											printf("call %s\n", node->rchild->name.c_str());
-											if(!f)
-												for(int i = III; i < IV; ++i)
-													printf("load %d t%d\n", i, i - III);
+											for(int i = III; i < IV; ++i)
+												printf("load %d t%d\n", i, i - III);
 											printf("%sa0\n", left.c_str());
 											param_index = 0;
 											break;

@@ -8,7 +8,6 @@ void yyerror(string msg);
 
 extern FILE *yyin;
 int stk;
-bool mflag;
 
 %}
 
@@ -48,32 +47,16 @@ GVarDecl : GVAR ASSIGN NUM {
 FuncDecl : FUNC LFKH NUM RFKH LFKH NUM RFKH {
 				stk = ($6 / 4 + 1) * 16;
 
-				if(strcmp($1, "f_main") == 0)
-					mflag = 1;
-				else mflag = 0;
-
 				printf("\t.text\n");
 				printf("\t.align 2\n");
-				if(mflag)
-				{
-					printf("\t.global main\n");
-					printf("\t.type main, @function\n");
-					printf("main:\n");
-				}
-				else
-				{
-					printf("\t.global %s\n", $1 + 2);
-					printf("\t.type @function\n");
-					printf("%s:\n", $1 + 2);
-				}
+				printf("\t.global %s\n", $1 + 2);
+				printf("\t.type %s, @function\n", $1 + 2);
+				printf("%s:\n", $1 + 2);
 				printf("\tadd sp, sp, %d\n", -stk);
 				printf("\tsw ra, %d(sp)\n", stk - 4);
 
 		 } StateList END FUNC {
-				if(mflag)
-					printf("\t.size main, .-main\n");
-				else
-					printf("\t.size %s, .-%s\n", $1 + 2, $1 + 2);
+				printf("\t.size %s, .-%s\n", $1 + 2, $1 + 2);
 		 }
 		 ;
 
@@ -136,10 +119,10 @@ Statement : REG ASSIGN REG OP REG {
 				printf("\tli %s, %d\n", $1, $3);
 		  }
 		  | REG LFKH NUM RFKH ASSIGN REG {
-				printf("\tsw %s, %d(%s)\n", $6, $3, $1);
+				printf("\tsw %s, -%d(%s)\n", $6, $3, $1);
 		  }
 		  | REG ASSIGN REG LFKH NUM RFKH {
-				printf("\tlw %s, %d(%s)\n", $1, $5, $3);
+				printf("\tlw %s, -%d(%s)\n", $1, $5, $3);
 		  }
 		  | IF REG OP REG GOTO LABEL {
 				switch($3[0])
